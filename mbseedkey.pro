@@ -8,10 +8,12 @@ CONFIG += c++11
 
 SOURCES += \
         ecuseedkeydll.cpp \
+        exutils.cpp \
         main.cpp
 
 HEADERS += \
-    ecuseedkeydll.h
+    ecuseedkeydll.h \
+    exutils.h
 
 RESOURCES += qml.qrc
 

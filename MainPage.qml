@@ -1,10 +1,12 @@
 import QtQuick 2.15
 import QtQuick.Controls 2.15
 import QtQuick.Layouts 1.15
+import github.mbseedkey.exutils 1.0
 
 Page
 {
     title: qsTr("Select Window")
+    property ExUTILS exutils: ExUTILS{}
 
 
     Component.onCompleted:
@@ -42,6 +44,7 @@ Page
                     elide: Text.ElideMiddle
                     verticalAlignment: Text.AlignVCenter
                     horizontalAlignment: Text.AlignHCenter
+                    text: exutils.foldername
                 }
             }
 
@@ -62,7 +65,7 @@ Page
                         var ordner = dllselect.folder.toString();
                         ordner = ordner.replace("file:///", "")
                         console.log("User has selected " + ordner);
-                        dllloadfoldertext.text = ordner
+                        exutils.foldername = ordner
                     }
                 }
             }

@@ -68,37 +68,60 @@ void ECUSeedKeyDLL::loadDllfuncs()
     this->GetECUName = (_f_GetECUName)GetProcAddress(this->p_dllHandle, "GetECUName");
     if(this->GetECUName != Q_NULLPTR)
     {
-        
+        this->p_ecu_name = this->GetECUName();
+        emit this->ECUNameChanged();
     }
 
     this->GetComment = (_f_GetComment)GetProcAddress(this->p_dllHandle, "GetComment");
     if(this->GetComment != Q_NULLPTR)
     {
-        
+        this->p_comment = this->GetComment();
+        emit this->CommentChanged();
     }
 
     this->GetSeedLength = (_f_GetSeedLength)GetProcAddress(this->p_dllHandle, "GetSeedLength");
     if(!this->GetSeedLength)
     {
-        
+       qDebug() << "Function GetSeedLength not found";
+       this->GetSeedLength = (_f_GetSeedLength)&tmp_ret_def_seedkey_len;
     }
 
     this->GetKeyLength = (_f_GetKeyLength)GetProcAddress(this->p_dllHandle, "GetKeyLength");
     if (!this->GetKeyLength)
     {
-        
+       qDebug() << "Function GetKeyLength not found";
+       this->GetKeyLength = (_f_GetKeyLength)&tmp_ret_def_seedkey_len;
     }
 
     this->GetConfiguredAccessTypes = (_f_GetConfiguredAccessTypes)GetProcAddress(this->p_dllHandle, "GetConfiguredAccessTypes");
     if(this->GetConfiguredAccessTypes != Q_NULLPTR)
-    {
-         
-    }
+     {
+        int data[256] = {0};
+        auto ret = this->GetConfiguredAccessTypes(data);
+        if(ret > 0)
+        {
+            do
+            {
+                auto atype = data[--ret];
+                ///WARNING: Seed and Key length functions could not be called in paralell or asynchrone!
+                /// make sure compiler can't optimize this calls and call this funcs one by one
+                ECUSeedKeyLenPairs skpair;
+                skpair.seed_len = this->GetSeedLength(atype);
+                skpair.key_len  = this->GetKeyLength(atype);
+                //qDebug() << " seed len: " << skpair.seed_len << " keylen " << skpair.key_len;
+                this->p_access_types.insert(atype, skpair);
+            }
+            while(ret > 0);
+            emit this->AccessTypesChanged();
+        }
+     }
 
     this->GenerateKeyExOpt = (_f_GenerateKeyExOpt)GetProcAddress(this->p_dllHandle, "GenerateKeyExOpt");
     if(this->GenerateKeyExOpt == Q_NULLPTR)
     {
-        
+        this->setErrorMsg(tr("GenerateKeyExOpt not found in DLL ") + this->p_dllPath);
+        qWarning() << this->errorMsg();
+        return;
     }
 }
 

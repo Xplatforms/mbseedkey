@@ -21,6 +21,33 @@ typedef int (__cdecl * _f_GenerateKeyExOpt )( const unsigned char* ipSeedArray,
                                                                   unsigned int iMaxKeyArraySize,
                                                                   unsigned int& oActualKeyArraySize );
 
+class ECUSeedKeyDLL : public QObject
+{
+    Q_OBJECT
+public:
+    explicit ECUSeedKeyDLL(QString dll_path, QObject *parent = nullptr);
+    ~ECUSeedKeyDLL();
+    
+
+private slots:
+    void loadDllfuncs();
+
+private:
+    _f_GetConfiguredAccessTypes     GetConfiguredAccessTypes;
+    _f_GetSeedLength                GetSeedLength;
+    _f_GetKeyLength                 GetKeyLength;
+    _f_GetECUName                   GetECUName;
+    _f_GetComment                   GetComment;
+    _f_GenerateKeyExOpt             GenerateKeyExOpt;
+
+private:
+    HMODULE     p_dllHandle;
+    QString     p_dllPath;
+
+    QString     p_errorMsg;
+    QString     p_ecu_name;
+    QString     p_comment;
+};
 
 
 #endif // ECUSEEDKEYDLL_H

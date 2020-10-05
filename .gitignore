@@ -1,3 +1,9 @@
+# Makefiles, Project files, etc
+Makefile
+Makefile.*
+*.user
+*.stash
+
 # Prerequisites
 *.d
 

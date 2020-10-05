@@ -23,6 +23,13 @@ QString GetLastErrorAsString()
     return message;
 }
 
+ECUSeedKeyDLL::ECUSeedKeyDLL(QObject *parent) : QObject(parent),
+    GetConfiguredAccessTypes(Q_NULLPTR), GetSeedLength(Q_NULLPTR), GetKeyLength(Q_NULLPTR),  GetECUName(Q_NULLPTR),
+    GenerateKeyExOpt(Q_NULLPTR),
+    p_dllHandle(Q_NULLPTR)
+{
+
+}
 
 ECUSeedKeyDLL::ECUSeedKeyDLL(QString dll_path, QObject *parent) : QObject(parent),
     GetConfiguredAccessTypes(Q_NULLPTR), GetSeedLength(Q_NULLPTR), GetKeyLength(Q_NULLPTR),  GetECUName(Q_NULLPTR),
@@ -44,6 +51,9 @@ ECUSeedKeyDLL::ECUSeedKeyDLL(QString dll_path, QObject *parent) : QObject(parent
     }
 
     this->p_ecu_name = info.baseName();
+    this->p_dll_name = info.fileName();
+    emit DLLNameChanged();
+
     QString dll_info_str = "[" + info.fileName() + "] ";
     qInfo() <<  dll_info_str << "Loading ...";
 
@@ -54,7 +64,7 @@ ECUSeedKeyDLL::ECUSeedKeyDLL(QString dll_path, QObject *parent) : QObject(parent
         this->setErrorMsg(tr("Could not load DLL file. Reason: ")+error_str);
         qInfo() << dll_info_str << this->errorMsg();
         return;
-    }
+    }    
     this->loadDllfuncs();
 }
 
@@ -65,41 +75,78 @@ ECUSeedKeyDLL::~ECUSeedKeyDLL()
 
 void ECUSeedKeyDLL::loadDllfuncs()
 {
+
     this->GetECUName = (_f_GetECUName)GetProcAddress(this->p_dllHandle, "GetECUName");
     if(this->GetECUName != Q_NULLPTR)
     {
-        
+        this->p_ecu_name = this->GetECUName();
+        emit this->ECUNameChanged();
     }
 
     this->GetComment = (_f_GetComment)GetProcAddress(this->p_dllHandle, "GetComment");
     if(this->GetComment != Q_NULLPTR)
     {
-        
+        this->p_comment = this->GetComment();
+        emit this->CommentChanged();
     }
 
     this->GetSeedLength = (_f_GetSeedLength)GetProcAddress(this->p_dllHandle, "GetSeedLength");
     if(!this->GetSeedLength)
     {
-        
+       qDebug() << "Function GetSeedLength not found";
+       this->GetSeedLength = (_f_GetSeedLength)&tmp_ret_def_seedkey_len;
     }
 
     this->GetKeyLength = (_f_GetKeyLength)GetProcAddress(this->p_dllHandle, "GetKeyLength");
     if (!this->GetKeyLength)
     {
-        
+       qDebug() << "Function GetKeyLength not found";
+       this->GetKeyLength = (_f_GetKeyLength)&tmp_ret_def_seedkey_len;
     }
 
     this->GetConfiguredAccessTypes = (_f_GetConfiguredAccessTypes)GetProcAddress(this->p_dllHandle, "GetConfiguredAccessTypes");
     if(this->GetConfiguredAccessTypes != Q_NULLPTR)
-    {
-         
-    }
+     {
+        int data[256] = {0};
+        auto ret = this->GetConfiguredAccessTypes(data);
+        if(ret > 0)
+        {
+            do
+            {
+                auto atype = data[--ret];
+                ///WARNING: Seed and Key length functions could not be called in paralell or asynchrone!
+                /// make sure compiler can't optimize this calls and call this funcs one by one
+                ECUSeedKeyLenPairs skpair;
+                skpair.seed_len = this->GetSeedLength(atype);
+                skpair.key_len  = this->GetKeyLength(atype);
+                //qDebug() << " seed len: " << skpair.seed_len << " keylen " << skpair.key_len;
+                this->p_access_types.insert(atype, skpair);
+            }
+            while(ret > 0);
+            emit this->AccessTypesChanged();
+
+        }
+     }
 
     this->GenerateKeyExOpt = (_f_GenerateKeyExOpt)GetProcAddress(this->p_dllHandle, "GenerateKeyExOpt");
     if(this->GenerateKeyExOpt == Q_NULLPTR)
     {
-        
+        this->setErrorMsg(tr("GenerateKeyExOpt not found in DLL ") + this->p_dllPath);
+        qWarning() << this->errorMsg();
+        return;
     }
+}
+
+QString ECUSeedKeyDLL::AccessTypesString()
+{
+    if(this->AccessTypes().isEmpty())return QStringLiteral("not defined in dll");
+    auto types = this->AccessTypes();
+    QString str;
+    foreach(auto t, types)
+    {
+        str.append(QString::number(t) + " ");
+    }
+    return str;
 }
 
 QList<qint32> ECUSeedKeyDLL::GenerateKeyFromSeed(QList<qint32> seed, qint32 access_type)
@@ -120,6 +167,7 @@ QList<qint32> ECUSeedKeyDLL::GenerateKeyFromSeed(QList<qint32> seed, qint32 acce
 
     ///FIX: some DLL's return zero but key is filled out
     auto ret = this->GenerateKeyExOpt(seed_data, seed.length(), access_type, Q_NULLPTR, Q_NULLPTR, key_data, 256,  key_data_len);
+    Q_UNUSED(ret)
     if(key_data_len <= 0 && (key_data[0] != 0 && key_data[1] != 0))
     {
         qWarning() << "GenerateKeyExOpt returned zero size, but data buf is set. Try to copy data";

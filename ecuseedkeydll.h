@@ -28,6 +28,7 @@ public:
     explicit ECUSeedKeyDLL(QString dll_path, QObject *parent = nullptr);
     ~ECUSeedKeyDLL();
     
+    Q_INVOKABLE QList<qint32> GenerateKeyFromSeed(QList<qint32> seed, qint32 access_type);
 
 private slots:
     void loadDllfuncs();

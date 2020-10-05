@@ -1,5 +1,6 @@
 import QtQuick 2.15
 import QtQuick.Controls 2.15
+import QtQuick.Dialogs 1.3
 
 ApplicationWindow
 {
@@ -10,6 +11,18 @@ ApplicationWindow
     visible: true
     title: qsTr("Stack")
 
+    FileDialog
+    {
+        id: dllselect
+        title: qsTr("Please select folder with SeedKey Dll's")
+        selectFolder: true
+
+        onAccepted:
+        {
+            console.log(folder);
+        }
+
+    }
 
     StackView
     {

@@ -28,6 +28,22 @@ public:
     explicit ECUSeedKeyDLL(QString dll_path, QObject *parent = nullptr);
     ~ECUSeedKeyDLL();
     
+    Q_PROPERTY(QString ECUName READ ECUName NOTIFY ECUNameChanged);
+    Q_PROPERTY(QString Comment READ Comment NOTIFY CommentChanged);
+    Q_PROPERTY(QList<qint32> AccessTypes READ AccessTypes NOTIFY AccessTypesChanged);
+    Q_PROPERTY(QString errorMsg READ errorMsg WRITE setErrorMsg NOTIFY errorMsgChanged);
+
+    QString ECUName() const {return this->p_ecu_name;}
+    QString Comment() const {return this->p_comment;}
+    QList<qint32> AccessTypes() {return this->p_access_types.keys();}
+    QString errorMsg(){return this->p_errorMsg;}
+    void setErrorMsg(const QString & msg ){if(this->p_errorMsg.compare(msg) == 0)return; this->p_errorMsg = msg; emit errorMsgChanged();}
+
+    Q_INVOKABLE qint32 SeedLength(qint32 access_type) {return this->p_access_types.contains(access_type)?
+                    this->p_access_types.value(access_type).seed_len:4; }
+    Q_INVOKABLE qint32 KeyLength(qint32 access_type) {return this->p_access_types.contains(access_type)?
+                    this->p_access_types.value(access_type).key_len:4; }
+    
     Q_INVOKABLE QList<qint32> GenerateKeyFromSeed(QList<qint32> seed, qint32 access_type);
 
 private slots:

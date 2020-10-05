@@ -31,19 +31,24 @@ class ECUSeedKeyDLL : public QObject
 {
     Q_OBJECT
 public:
+    explicit ECUSeedKeyDLL(QObject *parent = nullptr);
     explicit ECUSeedKeyDLL(QString dll_path, QObject *parent = nullptr);
     ~ECUSeedKeyDLL();
+
+    bool isSeedKeyDll(){return this->GenerateKeyExOpt != Q_NULLPTR;}
 
     Q_PROPERTY(QString ECUName READ ECUName NOTIFY ECUNameChanged);
     Q_PROPERTY(QString DLLName READ DLLName NOTIFY DLLNameChanged);
     Q_PROPERTY(QString Comment READ Comment NOTIFY CommentChanged);
     Q_PROPERTY(QList<qint32> AccessTypes READ AccessTypes NOTIFY AccessTypesChanged);
+    Q_PROPERTY(QString AccessTypesString READ AccessTypesString NOTIFY AccessTypesChanged);
     Q_PROPERTY(QString errorMsg READ errorMsg WRITE setErrorMsg NOTIFY errorMsgChanged);
 
     QString DLLName() const {return this->p_dll_name;}
     QString ECUName() const {return this->p_ecu_name;}
     QString Comment() const {return this->p_comment;}
     QList<qint32> AccessTypes() {return this->p_access_types.keys();}
+    QString AccessTypesString();
     QString errorMsg(){return this->p_errorMsg;}
     void setErrorMsg(const QString & msg ){if(this->p_errorMsg.compare(msg) == 0)return; this->p_errorMsg = msg; emit errorMsgChanged();}
 

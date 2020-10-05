@@ -23,6 +23,14 @@ QString GetLastErrorAsString()
     return message;
 }
 
+ECUSeedKeyDLL::ECUSeedKeyDLL(QObject *parent) : QObject(parent),
+    GetConfiguredAccessTypes(Q_NULLPTR), GetSeedLength(Q_NULLPTR), GetKeyLength(Q_NULLPTR),  GetECUName(Q_NULLPTR),
+    GenerateKeyExOpt(Q_NULLPTR),
+    p_dllHandle(Q_NULLPTR)
+{
+
+}
+
 ECUSeedKeyDLL::ECUSeedKeyDLL(QString dll_path, QObject *parent) : QObject(parent),
     GetConfiguredAccessTypes(Q_NULLPTR), GetSeedLength(Q_NULLPTR), GetKeyLength(Q_NULLPTR),  GetECUName(Q_NULLPTR),
     GenerateKeyExOpt(Q_NULLPTR),
@@ -43,6 +51,9 @@ ECUSeedKeyDLL::ECUSeedKeyDLL(QString dll_path, QObject *parent) : QObject(parent
     }
 
     this->p_ecu_name = info.baseName();
+    this->p_dll_name = info.fileName();
+    emit DLLNameChanged();
+
     QString dll_info_str = "[" + info.fileName() + "] ";
     qInfo() <<  dll_info_str << "Loading ...";
 
@@ -53,7 +64,7 @@ ECUSeedKeyDLL::ECUSeedKeyDLL(QString dll_path, QObject *parent) : QObject(parent
         this->setErrorMsg(tr("Could not load DLL file. Reason: ")+error_str);
         qInfo() << dll_info_str << this->errorMsg();
         return;
-    }
+    }    
     this->loadDllfuncs();
 }
 
@@ -113,6 +124,7 @@ void ECUSeedKeyDLL::loadDllfuncs()
             }
             while(ret > 0);
             emit this->AccessTypesChanged();
+
         }
      }
 
@@ -123,6 +135,18 @@ void ECUSeedKeyDLL::loadDllfuncs()
         qWarning() << this->errorMsg();
         return;
     }
+}
+
+QString ECUSeedKeyDLL::AccessTypesString()
+{
+    if(this->AccessTypes().isEmpty())return QStringLiteral("not defined in dll");
+    auto types = this->AccessTypes();
+    QString str;
+    foreach(auto t, types)
+    {
+        str.append(QString::number(t) + " ");
+    }
+    return str;
 }
 
 QList<qint32> ECUSeedKeyDLL::GenerateKeyFromSeed(QList<qint32> seed, qint32 access_type)

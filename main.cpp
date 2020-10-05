@@ -1,14 +1,18 @@
 #include <QGuiApplication>
 #include <QQmlApplicationEngine>
 #include "exutils.h"
+#include "ecuseedkeydll.h"
 
 int main(int argc, char *argv[])
 {
     QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
 
     QGuiApplication app(argc, argv);
+    app.setOrganizationName("mbseedkey");
+    app.setOrganizationDomain("mbseedkey");
 
-    qmlRegisterType<ExUTILS>("github.mbseedkey.exutils", 1, 0, "ExUTILS");
+    qmlRegisterType<ExUTILS>("xplatforms.mbseedkey.exutils", 1, 0, "ExUTILS");
+    qmlRegisterType<ECUSeedKeyDLL>("xplatforms.mbseedkey.ecuseedkeydll", 1, 0, "ECUSeedKeyDLL");
 
     QQmlApplicationEngine engine;    
     const QUrl url(QStringLiteral("qrc:/main.qml"));

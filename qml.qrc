@@ -3,5 +3,6 @@
         <file>main.qml</file>
         <file>qtquickcontrols2.conf</file>
         <file>MainPage.qml</file>
+        <file>ECUPage.qml</file>
     </qresource>
 </RCC>

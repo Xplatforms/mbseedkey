@@ -2,14 +2,15 @@ import QtQuick 2.15
 import QtQuick.Controls 2.15
 import QtQuick.Dialogs 1.3
 
+
 ApplicationWindow
 {
     id: window
 
     width: 780
-    height: 420
+    height: 480
     visible: true
-    title: qsTr("Stack")
+    title: qsTr(" Xplatforms / mbseedkey ")
 
     FileDialog
     {

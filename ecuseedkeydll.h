@@ -21,18 +21,26 @@ typedef int (__cdecl * _f_GenerateKeyExOpt )( const unsigned char* ipSeedArray,
                                                                   unsigned int iMaxKeyArraySize,
                                                                   unsigned int& oActualKeyArraySize );
 
+struct ECUSeedKeyLenPairs
+{
+    qint32 seed_len;
+    qint32 key_len;
+}typedef ECUSeedKeyLenPairs;
+
 class ECUSeedKeyDLL : public QObject
 {
     Q_OBJECT
 public:
     explicit ECUSeedKeyDLL(QString dll_path, QObject *parent = nullptr);
     ~ECUSeedKeyDLL();
-    
+
     Q_PROPERTY(QString ECUName READ ECUName NOTIFY ECUNameChanged);
+    Q_PROPERTY(QString DLLName READ DLLName NOTIFY DLLNameChanged);
     Q_PROPERTY(QString Comment READ Comment NOTIFY CommentChanged);
     Q_PROPERTY(QList<qint32> AccessTypes READ AccessTypes NOTIFY AccessTypesChanged);
     Q_PROPERTY(QString errorMsg READ errorMsg WRITE setErrorMsg NOTIFY errorMsgChanged);
 
+    QString DLLName() const {return this->p_dll_name;}
     QString ECUName() const {return this->p_ecu_name;}
     QString Comment() const {return this->p_comment;}
     QList<qint32> AccessTypes() {return this->p_access_types.keys();}
@@ -43,8 +51,17 @@ public:
                     this->p_access_types.value(access_type).seed_len:4; }
     Q_INVOKABLE qint32 KeyLength(qint32 access_type) {return this->p_access_types.contains(access_type)?
                     this->p_access_types.value(access_type).key_len:4; }
-    
+
     Q_INVOKABLE QList<qint32> GenerateKeyFromSeed(QList<qint32> seed, qint32 access_type);
+
+signals:
+    void ECUNameChanged();
+    void DLLNameChanged();
+    void CommentChanged();
+    void SeedLengthChanged();
+    void KeyLengthChanged();
+    void AccessTypesChanged();
+    void errorMsgChanged();
 
 private slots:
     void loadDllfuncs();
@@ -63,8 +80,10 @@ private:
 
     QString     p_errorMsg;
     QString     p_ecu_name;
+    QString     p_dll_name;
     QString     p_comment;
-};
 
+    QHash<qint32, ECUSeedKeyLenPairs> p_access_types;
+};
 
 #endif // ECUSEEDKEYDLL_H

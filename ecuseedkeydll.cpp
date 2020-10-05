@@ -23,7 +23,6 @@ QString GetLastErrorAsString()
     return message;
 }
 
-
 ECUSeedKeyDLL::ECUSeedKeyDLL(QString dll_path, QObject *parent) : QObject(parent),
     GetConfiguredAccessTypes(Q_NULLPTR), GetSeedLength(Q_NULLPTR), GetKeyLength(Q_NULLPTR),  GetECUName(Q_NULLPTR),
     GenerateKeyExOpt(Q_NULLPTR),
@@ -65,6 +64,7 @@ ECUSeedKeyDLL::~ECUSeedKeyDLL()
 
 void ECUSeedKeyDLL::loadDllfuncs()
 {
+
     this->GetECUName = (_f_GetECUName)GetProcAddress(this->p_dllHandle, "GetECUName");
     if(this->GetECUName != Q_NULLPTR)
     {
@@ -143,6 +143,7 @@ QList<qint32> ECUSeedKeyDLL::GenerateKeyFromSeed(QList<qint32> seed, qint32 acce
 
     ///FIX: some DLL's return zero but key is filled out
     auto ret = this->GenerateKeyExOpt(seed_data, seed.length(), access_type, Q_NULLPTR, Q_NULLPTR, key_data, 256,  key_data_len);
+    Q_UNUSED(ret)
     if(key_data_len <= 0 && (key_data[0] != 0 && key_data[1] != 0))
     {
         qWarning() << "GenerateKeyExOpt returned zero size, but data buf is set. Try to copy data";

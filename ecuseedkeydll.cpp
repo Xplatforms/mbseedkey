@@ -101,3 +101,36 @@ void ECUSeedKeyDLL::loadDllfuncs()
         
     }
 }
+
+QList<qint32> ECUSeedKeyDLL::GenerateKeyFromSeed(QList<qint32> seed, qint32 access_type)
+{
+    QList<qint32> key;
+    if(this->GenerateKeyExOpt == Q_NULLPTR)
+    {
+        qWarning() << this->errorMsg();
+        return key;
+    }
+
+    unsigned char * seed_data = new unsigned char[seed.length()];
+    auto i = 0;
+    foreach(auto d, seed)seed_data[i++] = d;
+
+    unsigned char key_data[256] = {0};
+    unsigned int key_data_len = 0;
+
+    ///FIX: some DLL's return zero but key is filled out
+    auto ret = this->GenerateKeyExOpt(seed_data, seed.length(), access_type, Q_NULLPTR, Q_NULLPTR, key_data, 256,  key_data_len);
+    if(key_data_len <= 0 && (key_data[0] != 0 && key_data[1] != 0))
+    {
+        qWarning() << "GenerateKeyExOpt returned zero size, but data buf is set. Try to copy data";
+        key_data_len = this->GetKeyLength(access_type);
+    }
+
+    unsigned int c = 0;
+    do
+    {
+        key.append(key_data[c++]);
+    }
+    while(c < key_data_len);
+    return key;
+}

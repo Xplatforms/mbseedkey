@@ -65,5 +65,39 @@ ECUSeedKeyDLL::~ECUSeedKeyDLL()
 
 void ECUSeedKeyDLL::loadDllfuncs()
 {
+    this->GetECUName = (_f_GetECUName)GetProcAddress(this->p_dllHandle, "GetECUName");
+    if(this->GetECUName != Q_NULLPTR)
+    {
+        
+    }
 
+    this->GetComment = (_f_GetComment)GetProcAddress(this->p_dllHandle, "GetComment");
+    if(this->GetComment != Q_NULLPTR)
+    {
+        
+    }
+
+    this->GetSeedLength = (_f_GetSeedLength)GetProcAddress(this->p_dllHandle, "GetSeedLength");
+    if(!this->GetSeedLength)
+    {
+        
+    }
+
+    this->GetKeyLength = (_f_GetKeyLength)GetProcAddress(this->p_dllHandle, "GetKeyLength");
+    if (!this->GetKeyLength)
+    {
+        
+    }
+
+    this->GetConfiguredAccessTypes = (_f_GetConfiguredAccessTypes)GetProcAddress(this->p_dllHandle, "GetConfiguredAccessTypes");
+    if(this->GetConfiguredAccessTypes != Q_NULLPTR)
+    {
+         
+    }
+
+    this->GenerateKeyExOpt = (_f_GenerateKeyExOpt)GetProcAddress(this->p_dllHandle, "GenerateKeyExOpt");
+    if(this->GenerateKeyExOpt == Q_NULLPTR)
+    {
+        
+    }
 }

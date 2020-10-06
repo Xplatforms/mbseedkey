@@ -26,6 +26,8 @@ public:
 
     Q_INVOKABLE void searchFor(QString txt);
 
+    Q_INVOKABLE QString getInputMaskForSeedLen(qint32 len);
+
 
 signals:
     void foldernameChanged();

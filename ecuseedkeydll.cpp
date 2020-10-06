@@ -182,7 +182,7 @@ Q_INVOKABLE qint32 ECUSeedKeyDLL::keyLength(QString access_type)
     return 0;
 }
 
-QList<qint32> ECUSeedKeyDLL::GenerateKeyFromSeed(QList<qint32> seed, qint32 access_type)
+QList<qint32> ECUSeedKeyDLL::generateKeyFromSeed(QList<qint32> seed, qint32 access_type)
 {
     QList<qint32> key;
     if(this->GenerateKeyExOpt == Q_NULLPTR)
@@ -214,4 +214,28 @@ QList<qint32> ECUSeedKeyDLL::GenerateKeyFromSeed(QList<qint32> seed, qint32 acce
     }
     while(c < key_data_len);
     return key;
+}
+
+QString ECUSeedKeyDLL::generateKeyFromSeed(QString seed, QString access_type, QString key_len)
+{
+    return this->generateKeyFromSeed(seed, access_type.toInt(Q_NULLPTR, 16), key_len.toInt(Q_NULLPTR, 16));
+}
+
+QString ECUSeedKeyDLL::generateKeyFromSeed(QString seed, qint32 access_type, qint32 key_len)
+{
+    Q_UNUSED(key_len);
+    //qDebug() << " seed_ " << seed;
+    QList<qint32> seed_list;
+    foreach(auto el, seed.split(QChar(' '), Qt::SkipEmptyParts))
+    {
+        bool ok;
+        auto hex = el.toInt(&ok,16);
+        seed_list.append(hex);
+        //qDebug() << "Val: " << el << " hex " << hex;
+    }
+    //qDebug() << "Splited list: " << seed_list;
+    auto key = this->generateKeyFromSeed(seed_list, access_type);
+    QString key_str;
+    while(!key.isEmpty()){key_str.append(QString::number(key.takeFirst(), 16)).append(QChar(' '));}
+    return key_str.trimmed().toUpper();
 }

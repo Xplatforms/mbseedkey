@@ -54,6 +54,8 @@ Page
         Button
         {
             text: qsTr("Change DLL folder")
+            Layout.minimumWidth: 240
+            font.weight: Font.DemiBold
             onClicked:
             {
                 dllselect.open();
@@ -197,6 +199,8 @@ Page
                     Button
                     {
                         Layout.alignment: Qt.AlignBottom
+                        Layout.minimumWidth: 180
+                        font.weight: Font.DemiBold
                         text: qsTr(" Select this DLL ")
 
                         onClicked:

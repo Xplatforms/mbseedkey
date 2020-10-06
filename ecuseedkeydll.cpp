@@ -126,9 +126,9 @@ void ECUSeedKeyDLL::loadDllfuncs()
             }
             while(ret > 0);
             emit this->AccessTypesChanged();
-
         }
      }
+    else qDebug() << "Function GetConfiguredAccessTypes not found";
 
     this->GenerateKeyExOpt = (_f_GenerateKeyExOpt)GetProcAddress(this->p_dllHandle, "GenerateKeyExOpt");
     if(this->GenerateKeyExOpt == Q_NULLPTR)
@@ -148,9 +148,38 @@ QString ECUSeedKeyDLL::AccessTypesString()
     QString str;
     foreach(auto t, types)
     {
-        str.append(QString::number(t) + " ");
+        str.append(QStringLiteral("%1 ").arg(t, 2, 16, QLatin1Char('0'))).toUpper();
     }
     return str;
+}
+
+QStringList ECUSeedKeyDLL::AccessTypesStringList()
+{
+    QStringList list;
+    foreach(auto a, this->AccessTypes())list << QStringLiteral("%1 ").arg(a, 2, 16, QLatin1Char('0')).toUpper();
+    return list;
+}
+
+Q_INVOKABLE qint32 ECUSeedKeyDLL::seedLength(QString access_type)
+{
+    auto acc = access_type.toInt(Q_NULLPTR,16);
+    if(this->p_access_types.contains(acc))
+    {
+        return this->p_access_types.value(acc).seed_len;
+    }
+
+    return 0;
+}
+
+Q_INVOKABLE qint32 ECUSeedKeyDLL::keyLength(QString access_type)
+{
+    auto acc = access_type.toInt(Q_NULLPTR,16);
+    if(this->p_access_types.contains(acc))
+    {
+        return this->p_access_types.value(acc).key_len;
+    }
+
+    return 0;
 }
 
 QList<qint32> ECUSeedKeyDLL::GenerateKeyFromSeed(QList<qint32> seed, qint32 access_type)

@@ -3,6 +3,7 @@
 #include <QGuiApplication>
 #include <QDebug>
 #include <QDir>
+#include <QRegularExpression>
 
 ExUTILS::ExUTILS(QObject *parent) : QObject(parent),
     p_sett(new QSettings(QStringLiteral("mbseedkey"),QStringLiteral("mbseedkey"),this)),
@@ -37,6 +38,8 @@ void ExUTILS::loadDllsList(QString search_txt)
     QFileInfoList list = dir.entryInfoList(QStringList() << "*.dll", QDir::Files |QDir::NoSymLinks |QDir::NoDotAndDotDot | QDir::Readable, QDir::Name );
     for(qint32 x = 0; x < list.count(); x++)
     {
+        this->dlls_list.append(list.at(x).fileName());
+        /*
         auto ecu_test = new ECUSeedKeyDLL(list.at(x).absoluteFilePath());
         if(ecu_test->isSeedKeyDll())
         {
@@ -44,6 +47,7 @@ void ExUTILS::loadDllsList(QString search_txt)
             qDebug() << "Adding DLL to list: " << ecu_test->DLLName();
         }
         delete ecu_test;
+        */
     }
     this->p_bak_dlls_list = dlls_list;
     emit dllsChanged();
@@ -86,4 +90,16 @@ void ExUTILS::setFoldername(QString fname)
         emit foldernameChanged();
         this->loadDllsList();
     }
+}
+
+
+///TODO: make it better
+QString ExUTILS::getInputMaskForSeedLen(qint32 len)
+{
+    QString str = "HH;0";
+    len *=2;
+    len--;
+    for(qint32 i = 0; i < len; i++)str.push_front("HH ");
+    str.push_front(QChar('>'));
+    return str;
 }

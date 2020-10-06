@@ -7,7 +7,7 @@ import xplatforms.mbseedkey.ecuseedkeydll 1.0
 Page
 {
     title: qsTr("Select Window")
-    property ExUTILS exutils: ExUTILS{}
+
 
     function searchFor(text)
     {
@@ -54,6 +54,8 @@ Page
         Button
         {
             text: qsTr("Change DLL folder")
+            Layout.minimumWidth: 240
+            font.weight: Font.DemiBold
             onClicked:
             {
                 dllselect.open();
@@ -197,9 +199,15 @@ Page
                     Button
                     {
                         Layout.alignment: Qt.AlignBottom
+                        Layout.minimumWidth: 180
+                        font.weight: Font.DemiBold
                         text: qsTr(" Select this DLL ")
 
-                        onClicked: stackView.push("ECUPage.qml")
+                        onClicked:
+                        {
+                            // stackView.push("ProfilePage.qml", {"currentprofile": appsettings.getProfileByID(appsettings.defaultProfileID())})
+                            stackView.push("ECUPage.qml", {"ecu": exutils.seedkeydll})
+                        }
                     }
                 }
             }

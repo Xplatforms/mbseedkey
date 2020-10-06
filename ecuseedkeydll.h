@@ -40,8 +40,12 @@ public:
     Q_PROPERTY(QString ECUName READ ECUName NOTIFY ECUNameChanged);
     Q_PROPERTY(QString DLLName READ DLLName NOTIFY DLLNameChanged);
     Q_PROPERTY(QString Comment READ Comment NOTIFY CommentChanged);
+
     Q_PROPERTY(QList<qint32> AccessTypes READ AccessTypes NOTIFY AccessTypesChanged);
+    /// TODO: two extra funcs for QML :/
     Q_PROPERTY(QString AccessTypesString READ AccessTypesString NOTIFY AccessTypesChanged);
+    Q_PROPERTY(QStringList AccessTypesStringList READ AccessTypesStringList NOTIFY AccessTypesChanged);
+
     Q_PROPERTY(QString errorMsg READ errorMsg WRITE setErrorMsg NOTIFY errorMsgChanged);
 
     QString DLLName() const {return this->p_dll_name;}
@@ -49,15 +53,21 @@ public:
     QString Comment() const {return this->p_comment;}
     QList<qint32> AccessTypes() {return this->p_access_types.keys();}
     QString AccessTypesString();
+    QStringList AccessTypesStringList();
     QString errorMsg(){return this->p_errorMsg;}
     void setErrorMsg(const QString & msg ){if(this->p_errorMsg.compare(msg) == 0)return; this->p_errorMsg = msg; emit errorMsgChanged();}
 
-    Q_INVOKABLE qint32 SeedLength(qint32 access_type) {return this->p_access_types.contains(access_type)?
+    Q_INVOKABLE qint32 seedLength(qint32 access_type) {return this->p_access_types.contains(access_type)?
                     this->p_access_types.value(access_type).seed_len:4; }
-    Q_INVOKABLE qint32 KeyLength(qint32 access_type) {return this->p_access_types.contains(access_type)?
-                    this->p_access_types.value(access_type).key_len:4; }
+    Q_INVOKABLE qint32 seedLength(QString access_type);
 
-    Q_INVOKABLE QList<qint32> GenerateKeyFromSeed(QList<qint32> seed, qint32 access_type);
+    Q_INVOKABLE qint32 keyLength(qint32 access_type) {return this->p_access_types.contains(access_type)?
+                    this->p_access_types.value(access_type).key_len:4; }
+    Q_INVOKABLE qint32 keyLength(QString access_type);
+
+    Q_INVOKABLE QList<qint32> generateKeyFromSeed(QList<qint32> seed, qint32 access_type);
+    Q_INVOKABLE QString generateKeyFromSeed(QString seed, qint32 access_type, qint32 key_len);
+    Q_INVOKABLE QString generateKeyFromSeed(QString seed, QString access_type, QString key_len);
 
 signals:
     void ECUNameChanged();

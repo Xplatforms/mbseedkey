@@ -11,13 +11,15 @@ QString GetLastErrorAsString()
 {
     //Get the error message, if any.
     auto errorMessageID = ::GetLastError();
-    if(errorMessageID == 0)return QStringLiteral(""); //No error message has been recorded
+    if(errorMessageID == 0)return QStringLiteral("No error message has been recorded");
 
     LPWSTR messageBuffer = Q_NULLPTR;
     size_t size = FormatMessageW(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
                                  NULL, errorMessageID, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), messageBuffer, 0, NULL);
 
+    qDebug() << " Debug errmsg: " << size << errorMessageID;
     auto message = QString::fromWCharArray(messageBuffer, size);
+    if(message.isEmpty())message.append(QString::number(errorMessageID));
     LocalFree(messageBuffer);
 
     return message;
@@ -124,15 +126,17 @@ void ECUSeedKeyDLL::loadDllfuncs()
             }
             while(ret > 0);
             emit this->AccessTypesChanged();
-
         }
      }
+    else qDebug() << "Function GetConfiguredAccessTypes not found";
 
     this->GenerateKeyExOpt = (_f_GenerateKeyExOpt)GetProcAddress(this->p_dllHandle, "GenerateKeyExOpt");
     if(this->GenerateKeyExOpt == Q_NULLPTR)
     {
         this->setErrorMsg(tr("GenerateKeyExOpt not found in DLL ") + this->p_dllPath);
         qWarning() << this->errorMsg();
+        this->p_ecu_name = tr("not seedkey dll");
+        emit ECUNameChanged();
         return;
     }
 }
@@ -144,12 +148,41 @@ QString ECUSeedKeyDLL::AccessTypesString()
     QString str;
     foreach(auto t, types)
     {
-        str.append(QString::number(t) + " ");
+        str.append(QStringLiteral("%1 ").arg(t, 2, 16, QLatin1Char('0'))).toUpper();
     }
     return str;
 }
 
-QList<qint32> ECUSeedKeyDLL::GenerateKeyFromSeed(QList<qint32> seed, qint32 access_type)
+QStringList ECUSeedKeyDLL::AccessTypesStringList()
+{
+    QStringList list;
+    foreach(auto a, this->AccessTypes())list << QStringLiteral("%1 ").arg(a, 2, 16, QLatin1Char('0')).toUpper();
+    return list;
+}
+
+Q_INVOKABLE qint32 ECUSeedKeyDLL::seedLength(QString access_type)
+{
+    auto acc = access_type.toInt(Q_NULLPTR,16);
+    if(this->p_access_types.contains(acc))
+    {
+        return this->p_access_types.value(acc).seed_len;
+    }
+
+    return 0;
+}
+
+Q_INVOKABLE qint32 ECUSeedKeyDLL::keyLength(QString access_type)
+{
+    auto acc = access_type.toInt(Q_NULLPTR,16);
+    if(this->p_access_types.contains(acc))
+    {
+        return this->p_access_types.value(acc).key_len;
+    }
+
+    return 0;
+}
+
+QList<qint32> ECUSeedKeyDLL::generateKeyFromSeed(QList<qint32> seed, qint32 access_type)
 {
     QList<qint32> key;
     if(this->GenerateKeyExOpt == Q_NULLPTR)
@@ -181,4 +214,28 @@ QList<qint32> ECUSeedKeyDLL::GenerateKeyFromSeed(QList<qint32> seed, qint32 acce
     }
     while(c < key_data_len);
     return key;
+}
+
+QString ECUSeedKeyDLL::generateKeyFromSeed(QString seed, QString access_type, QString key_len)
+{
+    return this->generateKeyFromSeed(seed, access_type.toInt(Q_NULLPTR, 16), key_len.toInt(Q_NULLPTR, 16));
+}
+
+QString ECUSeedKeyDLL::generateKeyFromSeed(QString seed, qint32 access_type, qint32 key_len)
+{
+    Q_UNUSED(key_len);
+    //qDebug() << " seed_ " << seed;
+    QList<qint32> seed_list;
+    foreach(auto el, seed.split(QChar(' '), Qt::SkipEmptyParts))
+    {
+        bool ok;
+        auto hex = el.toInt(&ok,16);
+        seed_list.append(hex);
+        //qDebug() << "Val: " << el << " hex " << hex;
+    }
+    //qDebug() << "Splited list: " << seed_list;
+    auto key = this->generateKeyFromSeed(seed_list, access_type);
+    QString key_str;
+    while(!key.isEmpty()){key_str.append(QString::number(key.takeFirst(), 16)).append(QChar(' '));}
+    return key_str.trimmed().toUpper();
 }

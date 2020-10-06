@@ -57,7 +57,6 @@ Page
 
             Label
             {
-
                 text: ecu.ECUName
             }
         }
@@ -86,7 +85,7 @@ Page
         {
             Layout.fillWidth: true
             id: use_custom_values_id
-            checked: false
+            checked: acc_combobox.count == 0
             text: qsTr("Set custom values for access level, seed and key length if dll doesn't provide them")
             font.italic: true
 
@@ -241,6 +240,57 @@ Page
             {
                 Layout.fillWidth: true
                 Layout.alignment: Qt.AlignTop
+
+
+                Label
+                {
+                    text: qsTr("SEED: ")
+                }
+
+                TextField
+                {
+                    id: seed_id
+                    Layout.fillWidth: true
+                    selectByMouse: true
+                    inputMask: exutils.getInputMaskForSeedLen(use_custom_values_id.checked?custom_seed_len_id.value:ecu.keyLength(acc_combobox.currentValue))
+                    //validator: ExInputValidator{}
+                    onFocusChanged:
+                    {
+                        if(focus)cursorPosition = 0;
+                    }
+                    onEditingFinished:
+                    {
+                        //text = exutils.patchSeedString(text)
+                    }
+                }
+
+
+                Label
+                {
+                    text: qsTr("KEY: ")
+                }
+
+                TextField
+                {
+                    id: key_id
+                    Layout.fillWidth: true
+                    readOnly: true
+                    selectByMouse: true
+
+                    onFocusChanged: focus?selectAll():deselect()
+                }
+
+
+                Button
+                {
+                    text: qsTr("Generate key")
+                    font.weight: Font.DemiBold
+                    Layout.minimumWidth: 180
+
+                    onClicked: key_id.text = ecu.generateKeyFromSeed(seed_id.displayText,
+                                                       use_custom_values_id.checked?custom_acc_lvl_id.text:acc_combobox.currentValue,
+                                                       use_custom_values_id.checked?custom_key_len_id.value.toString():ecu.keyLength(acc_combobox.currentValue) )
+                }
 
 
             }

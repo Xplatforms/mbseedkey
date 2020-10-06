@@ -1,7 +1,7 @@
 import QtQuick 2.15
 import QtQuick.Controls 2.15
 import QtQuick.Dialogs 1.3
-
+import xplatforms.mbseedkey.exutils 1.0
 
 ApplicationWindow
 {
@@ -11,6 +11,8 @@ ApplicationWindow
     height: 480
     visible: true
     title: qsTr(" Xplatforms / mbseedkey ")
+
+    property ExUTILS exutils: ExUTILS{}
 
     FileDialog
     {

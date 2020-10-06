@@ -11,13 +11,15 @@ QString GetLastErrorAsString()
 {
     //Get the error message, if any.
     auto errorMessageID = ::GetLastError();
-    if(errorMessageID == 0)return QStringLiteral(""); //No error message has been recorded
+    if(errorMessageID == 0)return QStringLiteral("No error message has been recorded");
 
     LPWSTR messageBuffer = Q_NULLPTR;
     size_t size = FormatMessageW(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
                                  NULL, errorMessageID, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), messageBuffer, 0, NULL);
 
+    qDebug() << " Debug errmsg: " << size << errorMessageID;
     auto message = QString::fromWCharArray(messageBuffer, size);
+    if(message.isEmpty())message.append(QString::number(errorMessageID));
     LocalFree(messageBuffer);
 
     return message;
@@ -133,6 +135,8 @@ void ECUSeedKeyDLL::loadDllfuncs()
     {
         this->setErrorMsg(tr("GenerateKeyExOpt not found in DLL ") + this->p_dllPath);
         qWarning() << this->errorMsg();
+        this->p_ecu_name = tr("not seedkey dll");
+        emit ECUNameChanged();
         return;
     }
 }

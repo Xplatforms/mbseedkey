@@ -37,6 +37,8 @@ void ExUTILS::loadDllsList(QString search_txt)
     QFileInfoList list = dir.entryInfoList(QStringList() << "*.dll", QDir::Files |QDir::NoSymLinks |QDir::NoDotAndDotDot | QDir::Readable, QDir::Name );
     for(qint32 x = 0; x < list.count(); x++)
     {
+        this->dlls_list.append(list.at(x).fileName());
+        /*
         auto ecu_test = new ECUSeedKeyDLL(list.at(x).absoluteFilePath());
         if(ecu_test->isSeedKeyDll())
         {
@@ -44,6 +46,7 @@ void ExUTILS::loadDllsList(QString search_txt)
             qDebug() << "Adding DLL to list: " << ecu_test->DLLName();
         }
         delete ecu_test;
+        */
     }
     this->p_bak_dlls_list = dlls_list;
     emit dllsChanged();

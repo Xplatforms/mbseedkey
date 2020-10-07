@@ -65,7 +65,7 @@ public:
                     this->p_access_types.value(access_type).key_len:4; }
     Q_INVOKABLE qint32 keyLength(QString access_type);
 
-    Q_INVOKABLE QList<qint32> generateKeyFromSeed(QList<qint32> seed, qint32 access_type);
+    Q_INVOKABLE QList<qint32> generateKeyFromSeed(QList<qint32> seed, qint32 access_type, qint32 key_len = 0);
     Q_INVOKABLE QString generateKeyFromSeed(QString seed, qint32 access_type, qint32 key_len);
     Q_INVOKABLE QString generateKeyFromSeed(QString seed, QString access_type, QString key_len);
 

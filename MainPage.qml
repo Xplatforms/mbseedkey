@@ -133,7 +133,7 @@ Page
                             anchors.fill: parent
                             onClicked:
                             {
-                                console.log("Current listview index:" + index)
+                                //console.log("Current listview index:" + index)
                                 listView.currentIndex = index;
                                 exutils.selectDll(index)
                             }

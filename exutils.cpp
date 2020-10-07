@@ -79,7 +79,7 @@ QString ExUTILS::foldername()
 {
     if(this->p_sett->contains(QStringLiteral("current_folder")))
         return QDir::toNativeSeparators(this->p_sett->value(QStringLiteral("current_folder")).toString());
-    else return QDir::toNativeSeparators(qApp->applicationDirPath());
+    else return QDir::toNativeSeparators(qApp->applicationDirPath()+QDir::toNativeSeparators("/dlls"));
 }
 
 void ExUTILS::setFoldername(QString fname)
@@ -96,11 +96,9 @@ void ExUTILS::setFoldername(QString fname)
 ///TODO: make it better
 QString ExUTILS::getInputMaskForSeedLen(qint32 len)
 {
-    qDebug() << "seed len" << len;
     QString str = "HH;0";
     len--;
     for(qint32 i = 0; i < len; i++)str.push_front("HH ");
     str.push_front(QChar('>'));
-    qDebug() << " inputMask " << str;
     return str;
 }

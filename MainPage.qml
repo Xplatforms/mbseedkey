@@ -200,6 +200,7 @@ Page
                     {
                         Layout.alignment: Qt.AlignBottom
                         Layout.minimumWidth: 180
+                        enabled: exutils.seedkeydll !== null
                         font.weight: Font.DemiBold
                         text: qsTr(" Select this DLL ")
 

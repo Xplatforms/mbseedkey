@@ -119,7 +119,7 @@ begin
 end;
 
 [Run]
-Filename: "{app}\vc_redist.x86.exe"; Description: "{cm:LaunchProgram,{#StringChange("Install vc_redist.x86.exe", "&", "&&")}}"; Flags: postinstall
+Filename: "{app}\vc_redist.x86.exe"; Description: "{cm:LaunchProgram,{#StringChange("vc_redist.x86.exe installer", "&", "&&")}}"; Flags: postinstall
 Filename: "{app}\{#MyAppExeName}"; Description: "{cm:LaunchProgram,{#StringChange("MBSeedKey 1.0", "&", "&&")}}"; Flags: nowait postinstall; Check: not VerySilentRun
 
 

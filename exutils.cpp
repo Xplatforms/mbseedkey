@@ -96,10 +96,11 @@ void ExUTILS::setFoldername(QString fname)
 ///TODO: make it better
 QString ExUTILS::getInputMaskForSeedLen(qint32 len)
 {
+    qDebug() << "seed len" << len;
     QString str = "HH;0";
-    len *=2;
     len--;
     for(qint32 i = 0; i < len; i++)str.push_front("HH ");
     str.push_front(QChar('>'));
+    qDebug() << " inputMask " << str;
     return str;
 }

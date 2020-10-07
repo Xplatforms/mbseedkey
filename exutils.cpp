@@ -79,7 +79,7 @@ QString ExUTILS::foldername()
 {
     if(this->p_sett->contains(QStringLiteral("current_folder")))
         return QDir::toNativeSeparators(this->p_sett->value(QStringLiteral("current_folder")).toString());
-    else return QDir::toNativeSeparators(qApp->applicationDirPath());
+    else return QDir::toNativeSeparators(qApp->applicationDirPath()+QDir::toNativeSeparators("/dlls"));
 }
 
 void ExUTILS::setFoldername(QString fname)

@@ -5,8 +5,6 @@
 #include <QDebug>
 #include <signal.h>
 
-auto tmp_ret_def_seedkey_len = [](int){return 4;};
-
 QString GetLastErrorAsString()
 {
     //Get the error message, if any.
@@ -96,14 +94,14 @@ void ECUSeedKeyDLL::loadDllfuncs()
     if(!this->GetSeedLength)
     {
        qDebug() << "Function GetSeedLength not found";
-       this->GetSeedLength = (_f_GetSeedLength)&tmp_ret_def_seedkey_len;
+       this->GetSeedLength = Q_NULLPTR;
     }
 
     this->GetKeyLength = (_f_GetKeyLength)GetProcAddress(this->p_dllHandle, "GetKeyLength");
     if (!this->GetKeyLength)
     {
        qDebug() << "Function GetKeyLength not found";
-       this->GetKeyLength = (_f_GetKeyLength)&tmp_ret_def_seedkey_len;
+       this->GetKeyLength = Q_NULLPTR;
     }
 
     this->GetConfiguredAccessTypes = (_f_GetConfiguredAccessTypes)GetProcAddress(this->p_dllHandle, "GetConfiguredAccessTypes");
@@ -148,7 +146,7 @@ QString ECUSeedKeyDLL::AccessTypesString()
     QString str;
     foreach(auto t, types)
     {
-        str.append(QStringLiteral("%1 ").arg(t, 2, 16, QLatin1Char('0'))).toUpper();
+        str = str.append(QStringLiteral("%1 ").arg(t, 2, 16, QLatin1Char('0'))).toUpper();
     }
     return str;
 }
@@ -182,7 +180,7 @@ Q_INVOKABLE qint32 ECUSeedKeyDLL::keyLength(QString access_type)
     return 0;
 }
 
-QList<qint32> ECUSeedKeyDLL::generateKeyFromSeed(QList<qint32> seed, qint32 access_type)
+QList<qint32> ECUSeedKeyDLL::generateKeyFromSeed(QList<qint32> seed, qint32 access_type, qint32 key_len)
 {
     QList<qint32> key;
     if(this->GenerateKeyExOpt == Q_NULLPTR)
@@ -204,7 +202,8 @@ QList<qint32> ECUSeedKeyDLL::generateKeyFromSeed(QList<qint32> seed, qint32 acce
     if(key_data_len <= 0 && (key_data[0] != 0 && key_data[1] != 0))
     {
         qWarning() << "GenerateKeyExOpt returned zero size, but data buf is set. Try to copy data";
-        key_data_len = this->GetKeyLength(access_type);
+        if(key_len != 0 || this->GetKeyLength == Q_NULLPTR)key_data_len = key_len;
+        else key_data_len = this->GetKeyLength(access_type);
     }
 
     unsigned int c = 0;
@@ -213,28 +212,27 @@ QList<qint32> ECUSeedKeyDLL::generateKeyFromSeed(QList<qint32> seed, qint32 acce
         key.append(key_data[c++]);
     }
     while(c < key_data_len);
+
+    //qDebug() << "[KEYDATA]: " << QByteArray::fromRawData((const char *)key_data, 255).toHex(' ');
     return key;
 }
 
 QString ECUSeedKeyDLL::generateKeyFromSeed(QString seed, QString access_type, QString key_len)
 {
-    return this->generateKeyFromSeed(seed, access_type.toInt(Q_NULLPTR, 16), key_len.toInt(Q_NULLPTR, 16));
+    return this->generateKeyFromSeed(seed, access_type.toInt(Q_NULLPTR, 16), key_len.toInt(Q_NULLPTR, 10));
 }
 
 QString ECUSeedKeyDLL::generateKeyFromSeed(QString seed, qint32 access_type, qint32 key_len)
 {
     Q_UNUSED(key_len);
-    //qDebug() << " seed_ " << seed;
     QList<qint32> seed_list;
     foreach(auto el, seed.split(QChar(' '), Qt::SkipEmptyParts))
     {
         bool ok;
         auto hex = el.toInt(&ok,16);
         seed_list.append(hex);
-        //qDebug() << "Val: " << el << " hex " << hex;
     }
-    //qDebug() << "Splited list: " << seed_list;
-    auto key = this->generateKeyFromSeed(seed_list, access_type);
+    auto key = this->generateKeyFromSeed(seed_list, access_type, key_len);
     QString key_str;
     while(!key.isEmpty()){key_str.append(QString::number(key.takeFirst(), 16)).append(QChar(' '));}
     return key_str.trimmed().toUpper();

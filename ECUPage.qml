@@ -10,12 +10,19 @@ Page
 
     property ECUSeedKeyDLL ecu
 
+    function updateInputMasks()
+    {
+        seed_id.inputMask = exutils.getInputMaskForSeedLen(use_custom_values_id.checked?custom_seed_len_id.value:ecu.seedLength(acc_combobox.currentValue));
+        key_id.inputMask = exutils.getInputMaskForSeedLen(use_custom_values_id.checked?custom_key_len_id.value:ecu.keyLength(acc_combobox.currentValue));
+    }
 
     ColumnLayout
     {
         anchors.fill: parent
         anchors.margins: 15
         spacing: 12
+
+        Component.onCompleted: updateInputMasks()
 
         RowLayout
         {
@@ -87,7 +94,8 @@ Page
             id: use_custom_values_id
             checked: acc_combobox.count == 0
             text: qsTr("Set custom values for access level, seed and key length if dll doesn't provide them")
-            font.italic: true
+            font.italic: true          
+            onCheckStateChanged: updateInputMasks();
 
         }
 
@@ -144,6 +152,11 @@ Page
                         {
 
                         }
+
+                        onDisplayTextChanged:
+                        {
+                            updateInputMasks();
+                        }
                     }
 
                     TextField
@@ -153,8 +166,9 @@ Page
                         Layout.minimumWidth: 100
                         placeholderText: qsTr("HEX")
                         inputMethodHints: Qt.ImhUppercaseOnly
-                        inputMask: "HHH"
+                        inputMask: ">HH;0"
                         selectByMouse: true
+                        horizontalAlignment: TextInput.AlignHCenter
 
                         onFocusChanged: custom_acc_lvl_id.cursorPosition = 0
                     }
@@ -190,6 +204,7 @@ Page
                         value: 4
                         editable: true
                         wheelEnabled: true
+                        onValueChanged: seed_id.inputMask = exutils.getInputMaskForSeedLen(value)
                     }
                 }
 
@@ -222,6 +237,7 @@ Page
                         value: 4
                         editable: true
                         wheelEnabled: true
+                        onValueChanged: key_id.inputMask = exutils.getInputMaskForSeedLen(value)
                     }
                 }
             }
@@ -252,7 +268,7 @@ Page
                     id: seed_id
                     Layout.fillWidth: true
                     selectByMouse: true
-                    inputMask: exutils.getInputMaskForSeedLen(use_custom_values_id.checked?custom_seed_len_id.value:ecu.keyLength(acc_combobox.currentValue))
+                    inputMask: exutils.getInputMaskForSeedLen(use_custom_values_id.checked?custom_seed_len_id.value:ecu.seedLength(acc_combobox.currentValue))
                     //validator: ExInputValidator{}
                     onFocusChanged:
                     {
@@ -276,8 +292,10 @@ Page
                     Layout.fillWidth: true
                     readOnly: true
                     selectByMouse: true
-
+                    inputMask: exutils.getInputMaskForSeedLen(use_custom_values_id.checked?custom_key_len_id.value:ecu.keyLength(acc_combobox.currentValue))
                     onFocusChanged: focus?selectAll():deselect()
+
+
                 }
 
 

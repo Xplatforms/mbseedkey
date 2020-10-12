@@ -234,6 +234,9 @@ QString ECUSeedKeyDLL::generateKeyFromSeed(QString seed, qint32 access_type, qin
     }
     auto key = this->generateKeyFromSeed(seed_list, access_type, key_len);
     QString key_str;
-    while(!key.isEmpty()){key_str.append(QString::number(key.takeFirst(), 16)).append(QChar(' '));}
+    while(!key.isEmpty()){
+        auto hex = key.takeFirst();if(hex < 16)key_str.append('0');
+        key_str.append(QString::number(hex, 16)).append(QChar(' '));
+    }
     return key_str.trimmed().toUpper();
 }

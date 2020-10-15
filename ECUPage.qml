@@ -85,8 +85,11 @@ Page
 
             Label
             {
-                text: qsTr("Comment: ")
+                Layout.fillWidth: true
+                text: qsTr("Comment: ")                
                 font.weight: Font.DemiBold
+                textFormat: Text.AutoText
+                onLinkActivated: Qt.openUrlExternally(link)
             }
         }
 

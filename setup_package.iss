@@ -4,7 +4,7 @@
 #define MyAppName "MBSeedKey"
 #define MyAppNameUninstall "MBSeedKey"
 #define MyAppFolderName "MBSeedKey"
-#define MyAppVersion "1.0.001"
+#define MyAppVersion "1.0.002"
 #define MyAppPublisher "Xplatforms"
 #define MyAppURL "https://github.com/Xplatforms/mbseedkey/releases"
 #define MyAppExeName "MBSeedKey.exe"
@@ -30,7 +30,7 @@ DefaultDirName={code:DefDirRoot}\Xplatforms\{#MyAppFolderName}
 DefaultGroupName=Xplatforms\{#MyAppName}
 LicenseFile=LICENSE
 OutputDir=..\BUILDS\
-OutputBaseFilename=MBSeedKey_{#MyAppVersion}
+OutputBaseFilename=MBSeedKey_x86_{#MyAppVersion}
 SetupIconFile=Resources\icon.ico
 Compression=lzma
 SolidCompression=yes
@@ -120,7 +120,7 @@ end;
 
 [Run]
 Filename: "{app}\vc_redist.x86.exe"; Description: "{cm:LaunchProgram,{#StringChange("vc_redist.x86.exe installer", "&", "&&")}}"; Flags: postinstall
-Filename: "{app}\{#MyAppExeName}"; Description: "{cm:LaunchProgram,{#StringChange("MBSeedKey 1.0", "&", "&&")}}"; Flags: nowait postinstall; Check: not VerySilentRun
+;Filename: "{app}\{#MyAppExeName}"; Description: "{cm:LaunchProgram,{#StringChange("MBSeedKey 1.0", "&", "&&")}}"; Flags: nowait postinstall; Check: not VerySilentRun
 
 
 

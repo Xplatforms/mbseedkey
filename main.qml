@@ -10,7 +10,7 @@ ApplicationWindow
     width: 780
     height: 480
     visible: true
-    title: qsTr(" Xplatforms / mbseedkey ")
+    title: qsTr(" https://github.com/Xplatforms/mbseedkey ")
 
     property ExUTILS exutils: ExUTILS{}
 

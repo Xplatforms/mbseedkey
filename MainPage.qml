@@ -187,7 +187,10 @@ Page
                     Text
                     {
                         Layout.fillHeight: true
+                        Layout.fillWidth: true
+                        wrapMode: Text.WordWrap
                         text: exutils.seedkeydll?exutils.seedkeydll.Comment:qsTr("not loaded")
+                        onLinkActivated: Qt.openUrlExternally(link)
                     }
 
                     Rectangle

@@ -11,9 +11,20 @@ Page
     property ECUSeedKeyDLL ecu
 
     function updateInputMasks()
-    {
+    {        
+        console.log("set mask: " + exutils.getInputMaskForSeedLen(use_custom_values_id.checked?custom_seed_len_id.value:ecu.seedLength(acc_combobox.currentValue)));
         seed_id.inputMask = exutils.getInputMaskForSeedLen(use_custom_values_id.checked?custom_seed_len_id.value:ecu.seedLength(acc_combobox.currentValue));
         key_id.inputMask = exutils.getInputMaskForSeedLen(use_custom_values_id.checked?custom_key_len_id.value:ecu.keyLength(acc_combobox.currentValue));
+    }
+
+    Timer
+    {
+        id: upd_timer_id
+        repeat: false
+        running: false
+        interval: 200
+        onTriggered: updateInputMasks()
+
     }
 
     ColumnLayout
@@ -74,8 +85,11 @@ Page
 
             Label
             {
-                text: qsTr("Comment: ")
+                Layout.fillWidth: true
+                text: qsTr("Comment: ")                
                 font.weight: Font.DemiBold
+                textFormat: Text.AutoText
+                onLinkActivated: Qt.openUrlExternally(link)
             }
         }
 
@@ -155,7 +169,9 @@ Page
 
                         onDisplayTextChanged:
                         {
-                            updateInputMasks();
+                            //console.log("combo changed" + acc_combobox.currentValue );
+                            //updateInputMasks();
+                            upd_timer_id.start();
                         }
                     }
 

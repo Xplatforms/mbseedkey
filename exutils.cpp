@@ -6,7 +6,7 @@
 #include <QRegularExpression>
 
 ExUTILS::ExUTILS(QObject *parent) : QObject(parent),
-    p_sett(new QSettings(QStringLiteral("mbseedkey"),QStringLiteral("mbseedkey"),this)),
+    p_sett(new QSettings(QStringLiteral("Xplatforms"),QStringLiteral("mbseedkey"),this)),
     p_seedkey_dll(Q_NULLPTR)
 {
     this->loadDllsList();

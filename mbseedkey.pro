@@ -5,7 +5,7 @@ CONFIG += c++latest
 RC_ICONS="Resources/icon.ico"
 RC_LANG="en"
 
-VERSION=1.0.1.00
+VERSION=1.0.2.00
 
 # You can make your code fail to compile if it uses deprecated APIs.
 # In order to do so, uncomment the following line.

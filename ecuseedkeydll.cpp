@@ -226,7 +226,7 @@ QString ECUSeedKeyDLL::generateKeyFromSeed(QString seed, qint32 access_type, qin
 {
     Q_UNUSED(key_len);
     QList<qint32> seed_list;
-    foreach(auto el, seed.split(QChar(' '), Qt::SkipEmptyParts))
+    foreach(auto el, seed.split(QChar(' '), QString::SkipEmptyParts))
     {
         bool ok;
         auto hex = el.toInt(&ok,16);

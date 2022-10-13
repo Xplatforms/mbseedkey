@@ -1,6 +1,8 @@
 #include <QCoreApplication>
 #include <QDebug>
 #include <QCommandLineParser>
+#include <QFileInfo>
+#include <QDir>
 #include "exutils.h"
 #include "ecuseedkeydll.h"
 
@@ -55,6 +57,25 @@ int main(int argc, char *argv[])
     auto seed = parser.value("s");
     auto level = parser.value("l");
     qDebug() << info << targetDll;
+
+    if(info)
+    {
+        if(targetDll.isEmpty()){qDebug() << QCoreApplication::translate("main", "DLL not set!"); return 0;}
+        QFileInfo info(targetDll);
+        if(!info.isFile() || !info.isReadable())
+        {
+            qDebug() << QCoreApplication::translate("main", "can't read DLL or wrong filepath");
+            return 0;
+        }
+
+        auto ecu = new ECUSeedKeyDLL(targetDll);
+        qDebug() << ecu->ECUName();
+        qDebug() << "Access Levels" << ecu->AccessTypesString();
+        foreach(auto acc, ecu->AccessTypes())
+        {
+            qDebug() << "Access LeveL: " << QStringLiteral("%1 ").arg(acc, 2, 16, QLatin1Char('0')).toUpper() << "seed length " << ecu->seedLength(acc) << " key length " << ecu->keyLength(acc);
+        }
+    }
 
 
     return app.exec();

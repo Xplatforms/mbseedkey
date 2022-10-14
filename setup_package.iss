@@ -4,10 +4,11 @@
 #define MyAppName "MBSeedKey"
 #define MyAppNameUninstall "MBSeedKey"
 #define MyAppFolderName "MBSeedKey"
-#define MyAppVersion "1.0.002"
+#define MyAppVersion "1.0.003"
 #define MyAppPublisher "Xplatforms"
 #define MyAppURL "https://github.com/Xplatforms/mbseedkey/releases"
 #define MyAppExeName "MBSeedKey.exe"
+#define MyAppExeNameCLI "mbseedkey_cli.exe"
 #define registrychars "%1"
 
 
@@ -53,6 +54,7 @@ Source: "LICENSE"; DestDir: "{app}"; Flags: ignoreversion overwritereadonly repl
 
 [Icons]
 Name: "{userprograms}\Xplatforms\{#MyAppName}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; 
+Name: "{userprograms}\Xplatforms\{#MyAppName}\{#MyAppExeNameCLI}"; Filename: "{app}\{#MyAppExeNameCLI}";
 Name: "{userdesktop}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; Tasks: desktopicon
 Name: "{userappdata}\Microsoft\Internet Explorer\Quick Launch\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; Tasks: quicklaunchicon
 

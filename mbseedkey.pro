@@ -1,11 +1,23 @@
 QT += quick
 CONFIG += c++latest
 
+GIT_LATEST_TAG=$$system(git describe --always --abbrev=0)
+SW_VERSION=\\\"$$GIT_LATEST_TAG\\\"
+DEFINES += SW_VERSION=$$(SW_VERSION)
+
+VERSION_MAJOR=$$section(GIT_LATEST_TAG, ., 0, 0)
+VERSION_MINOR=$$section(GIT_LATEST_TAG, ., 1, 1)
+VERSION_PATCH=$$section(GIT_LATEST_TAG, ., 2, 2)
 
 RC_ICONS="Resources/icon.ico"
 RC_LANG="en"
 
-VERSION=1.0.3.00
+VERSION=$$GIT_LATEST_TAG
+VERSION_PE_HEADER = $$VERSION_MAJOR'.'$$VERSION_MINOR
+
+message("VER: $$VERSION" )
+
+DEFINES += QT_NO_DEBUG_OUTPUT
 
 # You can make your code fail to compile if it uses deprecated APIs.
 # In order to do so, uncomment the following line.

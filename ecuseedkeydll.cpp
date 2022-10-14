@@ -55,7 +55,7 @@ ECUSeedKeyDLL::ECUSeedKeyDLL(QString dll_path, QObject *parent) : QObject(parent
     emit DLLNameChanged();
 
     QString dll_info_str = "[" + info.fileName() + "] ";
-    qInfo() <<  dll_info_str << "Loading ...";
+    qDebug() <<  dll_info_str << "Loading ...";
 
     this->p_dllHandle = LoadLibraryW(QDir::toNativeSeparators(info.absoluteFilePath()).toStdWString().data());
     if(!this->p_dllHandle)

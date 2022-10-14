@@ -8,7 +8,7 @@ int main(int argc, char *argv[])
     QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
 
     QGuiApplication app(argc, argv);
-    app.setOrganizationName("mbseedkey");
+    app.setOrganizationName("Xplatforms");
     app.setOrganizationDomain("mbseedkey");
 
     qmlRegisterType<ExUTILS>("xplatforms.mbseedkey.exutils", 1, 0, "ExUTILS");
